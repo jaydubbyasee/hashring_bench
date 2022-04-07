@@ -5,7 +5,7 @@ require 'securerandom'
 Benchmark.ips do |x|
   # Configure the number of seconds used during
   # the warmup phase (default 2) and calculation phase (default 5)
-  x.config(:time => 10, :warmup => 2)
+  x.config(:time => 60, :warmup => 2)
 
   # Populate shards
   shards = []
@@ -13,7 +13,7 @@ Benchmark.ips do |x|
     shards.push(HashringBench::Shard.new("shard-#{i}", 360.div(10) * i))
   end
 
-  x.report("normal_assignment") do |times|
+  x.report("Simple modulo assignment") do |times|
     i = 0
     while i < times
       HashringBench::get_shard_idx(shards, "test-#{i}")
@@ -21,7 +21,7 @@ Benchmark.ips do |x|
     end
   end
 
-  x.report("consistent_assignment") do |times|
+  x.report("Consistent Hashring w/ Binary Search") do |times|
     i = 0
     while i < times
       HashringBench::get_consistent_shard_idx_bs(shards, "test-#{i}")
@@ -30,7 +30,7 @@ Benchmark.ips do |x|
   end
 
   memo1 = {}
-  x.report("consistent_assignment_memo") do |times|
+  x.report("Consistent Hashring w/ Memoized Binary Search") do |times|
     i = 0
     while i < times
       HashringBench::get_consistent_shard_idx_memo(shards, "test-#{i}", memo1)
@@ -39,7 +39,7 @@ Benchmark.ips do |x|
   end
 
   memo2 = {}
-  x.report("consistent_shard_linear") do |times|
+  x.report("Consistent Hashring w/ Linear Memoized Search") do |times|
     i = 0
     while i < times
       HashringBench::get_consistent_shard_idx_memo(shards, "test-#{i}", memo2)
